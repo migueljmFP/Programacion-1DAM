@@ -1,2 +1,2 @@
-# Programaci-n-1DAM
+# Programación-1DAM
 Este repositorio es para la asignatura Programación
