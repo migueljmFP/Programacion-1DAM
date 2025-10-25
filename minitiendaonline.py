@@ -88,6 +88,7 @@ def cambiar_activo(n):
             else:
                 articulo['activo'] = False
             print("Se ha actualizado el estado activo/inactivo")
+            return
     print("Artículo no encontrado")
 
 def ejecutar_opcion(opcion):
@@ -115,3 +116,4 @@ while opcion != 7:
     mostrar_menu(menu_principal)
     opcion = int(input("Escoge una opción (Introduce el número correspondiente): "))
     ejecutar_opcion(opcion)
+
