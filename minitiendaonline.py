@@ -13,6 +13,7 @@ menu_articulos = ("Crear artículo",
                   "Eliminar artículo",
                   "Alternar activo/inactivo",
                   "Salir")
+usuario_activo = 0
 #variables de usuario
 usuarios = []
 usuario = {"id": "",
@@ -26,6 +27,21 @@ menu_usuario = ("Crear usuario",
                 "Eliminar usuario",
                 "Alternar activo/inactivo",
                 "Volver")
+#variables de carrito/ventas
+ventas = []
+id_venta = 0
+venta = {"id_venta": "",
+         "usuario_id": "",
+         "items": [("articulo_id", "cantidad", "precio_unitario" )],
+         "total": ""}
+menu_ventas = ("Seleccionar usuario activo",
+               "Añadir artículo al carrito",
+               "Quitar artículo del carrito",
+               "Ver carrito",
+               "Confirmar compra",
+               "Historial de ventas por usuario",
+               "Vaciar carrito",
+               "Volver")
 #definición de funciones
 def mostrar_menu(n):
     for i, elemento in enumerate(n, start=1):
@@ -192,22 +208,124 @@ def cambiar_activo_usuario(n):
             return
     print("Usuario no encontrado")
 
-def ejecutar_opcion_usuario(n):
+def ejecutar_opcion_usuario(opcion):
         match opcion:
             case 1:
-                crear_usuario(n)
+                crear_usuario(usuarios)
             case 2:
-                listar_usuarios(n)
+                listar_usuarios(usuarios)
             case 3:
-                buscar_por_id_usuario(n)
+                buscar_por_id_usuario(usuarios)
             case 4:
-                actualizar_usuario(n)
+                actualizar_usuario(usuarios)
             case 5:
-                eliminar_usuario(n)
+                eliminar_usuario(usuarios)
             case 6:
-                cambiar_activo_usuario(n)
+                cambiar_activo_usuario(usuarios)
             case 7:
                 print("Saliendo del apartado de Usuarios...")
+            case _:
+                print("Número no válido")
+
+#funciones de carrito/ventas
+def usuario_activar(n):
+    seleccionar = int(input("Introduce el id del usuario que quieras seleccionar para la compra: "))
+    for usuario in usuarios:
+        if usuario['id'] == seleccionar:
+            usuario_activo = seleccionar
+            id_venta += 1
+            venta.update({"id_venta": id_venta, "usuario_id": usuario_activo})
+            print("El usuario se ha seleccionado correctamente")
+            return usuario_activo
+        print("El usuario no es válido o no existe")
+
+def añadir_articulo(n):
+    if usuario_activo == 0:
+        print("Primero debes seleccionar un usuario activo")
+        return
+    id_articulo = int(input("Introduce el ID del artículo a añadir: "))
+    cantidad = int(input("Introduce la cantidad: "))
+    for art in articulos:
+        if art["id"] == id_articulo:
+            if art["stock"] >= cantidad:
+                art["stock"] -= cantidad
+                venta["items"].append((id_articulo, cantidad, art["precio"]))
+                print(f"Artículo '{art['nombre']}' añadido al carrito")
+            else:
+                print("No hay suficiente stock")
+            return
+    print("Artículo no encontrado")
+
+def quitar_articulo_carrito(n):
+    if not venta["items"]:
+        print("El carrito está vacío")
+        return
+    id_articulo = int(input("Introduce el ID del artículo a quitar: "))
+    for i, item in enumerate(venta["items"]):
+        if item[0] == id_articulo:
+            venta["items"].pop(i)
+            print("Artículo eliminado del carrito")
+            return
+    print("Artículo no encontrado en el carrito")
+
+def ver_carrito():
+    if not venta["items"]:
+        print("El carrito está vacío")
+        return
+    print("Carrito actual:")
+    for item in venta["items"]:
+        print(f"ID Artículo: {item[0]}, Cantidad: {item[1]}, Precio unitario: {item[2]}")
+
+def confirmar_compra(n):
+    if usuario_activo == 0:
+        print("Primero debes seleccionar un usuario activo")
+        return
+    if not venta["items"]:
+        print("El carrito está vacío")
+        return
+
+    total = sum(cantidad * precio for _, cantidad, precio in venta["items"])
+    id_venta += 1
+    venta.update({"id_venta": id_venta, "usuario_id": usuario_activo, "total": total})
+    ventas.append(venta.copy())
+    venta["items"].clear()
+    print(f"Compra confirmada. Total: {total}")
+
+def historial_ventas_por_usuario(n):
+    id_usuario = int(input("Introduce el ID del usuario: "))
+    tiene_ventas = False
+
+    for v in n:
+        if v["usuario_id"] == id_usuario:
+            print(f"Venta ID: {v['id_venta']}, Total: {v['total']}, Items: {v['items']}")
+            tiene_ventas = True
+
+    if not tiene_ventas:
+        print("No hay ventas para este usuario.")
+
+def vaciar_carrito(venta):
+    venta["items"].clear()
+    print("Carrito vaciado")
+
+
+def ejecutar_opcion_venta(opcion):
+        match opcion:
+            case 1:
+                usuario_activar(ventas)
+            case 2:
+                añadir_articulo(ventas)
+            case 3:
+                quitar_articulo_carrito(ventas)
+            case 4:
+                ver_carrito(ventas)
+            case 5:
+                confirmar_compra(ventas)
+            case 6:
+                historial_ventas_por_usuario(ventas)
+            case 7:
+                vaciar_carrito(venta)
+            case 8:
+                print("Saliendo del apartado de ventas...")
             case _:
                 print("Número no válido")
 
@@ -221,4 +339,8 @@ opcion = 0
 while opcion != 7:
     mostrar_menu(menu_usuario)
     opcion = int(input("Escoge una opción (Introduce el número correspondiente): "))
-    ejecutar_opcion_usuario(usuarios)
+    ejecutar_opcion_usuario(opcion)
+while opcion != 8:
+    mostrar_menu(menu_ventas)
+    opcion = int(input("Escoge una opción (Introduce el número correspondiente): "))
+    ejecutar_opcion_venta(opcion)
