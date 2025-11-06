@@ -12,10 +12,11 @@ efectividad_objeto = {"estaca": 0.6,
                       "poción mágica": 0.7,
                       "hechizo": 0.8}
 intentos = 3
-
+monstruo_derrotado = False
 print("¡Bienvenido a la caza de monstruos de Halloween!")
 
 monstruo_seleccionado = random.choice(list(monstruos.keys()))
+print(f"Ha aparecido {monstruo_seleccionado} con un nivel de dificultad {monstruos[monstruo_seleccionado]}")
 
 while intentos != 0:
     print(f"Tienes {intentos} intentos restantes")
@@ -29,5 +30,19 @@ while intentos != 0:
     print(f"Has usado el objeto: {objeto_usar}")
     dificultad = monstruos[monstruo_seleccionado]
     efectividad = efectividad_objeto[objeto_usar]
-    probabilidad_exito = efectividad - dificultad * 0,1
-    intentos -= intentos
+    probabilidad_exito = efectividad - dificultad * 0.1
+    resultado = random.random()
+
+    if resultado < probabilidad_exito:
+        print("¡Has cazado al monstruo, felicidades!")
+        monstruo_derrotado = True
+        intentos = 0
+    else:
+        print("¡El monstruo ha esquivado el ataque!")
+        intentos -= 1
+
+if monstruo_derrotado:
+    print("¡Felicidades, has ganado la caza de Monstruos!")
+else:
+    print("¡El monstruo ha logrado escapar, has perdido!")
+
